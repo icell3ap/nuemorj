@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ubermorj!null</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+
+        * {
+            /* font-family: Verdana, Geneva, Tahoma, sans-serif; Trebuchet MS*/ 
+            /* font-family: 'Quicksand', sans-serif; */
+            font-family: Trebuchet MS, Tahoma, sans-serif;
+        }
+
+        body {
+            margin: 50px;
+            /* margin: 16px; */
+            font-size: 18px;
+        }
+
+        .container {
+            /* 
+            width: 100vw;
+            height: 100vh;
+            */
+            
+            display: grid;
+            
+            grid-template-areas:
+            '. head head .'
+            '. main chat .'
+            '. main . .';
+
+            /* causes chat to expand left squeezing main
+            grid-template-rows: 1fr 7fr 1fr;
+            grid-template-columns: 3fr 1fr;
+            */
+            grid-template-rows: 100px 450px auto;
+            /*
+            grid-template-columns: 3% 65% 25% 7%;
+            */
+            grid-template-columns: 50px auto 250px 50px;
+            
+            grid-gap: 20px;
+            /*padding: 16px;*/
+            /*
+            background: #999 url('honeycomb-bg.png');
+            */
+            background-color: #fff;
+            /*
+            background-image: url('server-assets/audio/hexagon-bg.svg');
+            background-position: center;
+            background-repeat: repeat-y;
+            */
+            
+            /*
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            */
+        }
+
+        .container > div{
+            background: rgba(255, 255, 255, 0.97);
+        }
+        /* padding-right 0; is temporary (doesn't even work anyway might be because of the that one . empty cell) */
+        .itemhead {
+            grid-area: head;
+            text-align: center;
+
+            line-height: 52px;
+        }
+        .itemmain { grid-area: main; }
+        .itemchat {
+            grid-area: chat;
+            /*  
+            padding: 20px;
+            */
+            /* 
+            position: fixed;
+            right: 0;
+            */
+        }
+        /*
+        form {
+            margin: 0;
+        }
+        */  
+        textarea {
+            border:1px solid #666;
+            width:100%;
+            height:160px;
+            margin:5px 0;
+            /* padding:0px; */
+            padding: 8px;
+            font-size: 16px;
+
+        }
+
+        #divc {
+            width: 250px;
+            height: 150px;
+            background-color: rgb(228, 228, 228);
+            border: 2px solid #000;
+            margin: 5px;
+            padding: 5px;
+            text-align: center;
+            vertical-align: middle;
+            display: none;
+        }
+
+        #divc:hover {
+            background-color: rgb(173, 173, 173);
+        }
+
+        .disable-select {
+            -webkit-user-select: none;  
+            -moz-user-select: none;    
+            -ms-user-select: none;      
+            user-select: none;
+        }
+
+        .currentUser {
+            color: gainsboro;
+            font-weight: bold;
+        }
+        #authScreen {
+            display: none;
+        }
+        #fieldScreen {
+            display: block;
+        }
+        #symsScreen {
+            display: none;
+        }
+        #initialScreen {
+            display: none;
+        }
+        
+        .scrollNoBar {
+            height: 440px;
+            overflow-y: scroll;
+            /*
+            overflow: hidden;
+            overflow-y: hidden;
+            */
+        }
+        
+        .scrollNoBar::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollNoBar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .noscrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .noscrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        #gamechat {
+            height: 420px;
+            /*width: calc(90% - 20px);*/
+            width: 250px;
+            white-space: normal;
+            overflow-x: hidden;
+        }
+        .hyphenate {
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+            -moz-hyphens: auto;
+            hyphens: auto;
+        }
+
+        ul {
+            /*
+            list-style: none;
+            */
+            list-style-position: inside;
+            padding-left: 0;
+        }
+        
+        #formAuth {
+            /*width: 50%;*/
+            font-size: 128px;
+            /*min-width: 500px;*/
+            /*height: 500px;*/
+            /*
+            display: inline-block;
+            vertical-align: middle;
+            text-align: center;
+            */
+        }
+
+        #inputAuth {
+            font-size: 96px;
+            height: 300px;
+            border: 2px solid rgb(20, 20, 20);
+        }
+
+        #curwodel {
+            margin-top: 0;
+            padding-top: 0;
+        }
+        #curwodel > h2{
+            margin-top: 0;
+            padding-top: 0;
+        }
+    </style>
+    
+  </head>
+  <body>
+
+
+
+    <div id="authScreen">
+
+        <form id="formAuth">
+            <input id="inputAuth" autocomplete="off" autofocus placeholder="i beg for your name"/>
+            <!--
+            <button>CONNECT</button>
+            -->
+        </form>
+
+    </div>
+
+
+
+
+    <div id="initialScreen">
+
+        <h1>Init Screen</h1>
+
+
+        <button
+            type="submit"
+            class="btn btn-success"
+            id="newRoomButton"
+        >
+            Create New Room
+        </button>
+
+        <br><br>
+
+        <form id="formJoin" action="">
+            <input id="inputJoin" autocomplete="off" placeholder="Enter Room Code"/><button>Join</button>
+        </form>
+        
+        <br>
+
+        <button
+            type="submit"
+            class="btn btn-success"
+            id="fieldButton"
+        >
+            Visit Field
+        </button>
+
+        <h3>Rooms:</h3>
+        <ol id='rooms'></ol>
+
+        <!--
+        <hr>
+        <div id="divson">
+            this text should've been replaced by words.json content
+        </div>
+        -->
+
+    </div>
+
+
+
+    <div id="symsScreen">
+
+    <div class="container">
+        <div id='titleGame' class="itemhead">
+            <h1>Synonyms</h1>
+        </div>
+
+        <div class="itemchat">
+            <div id='gamechat' class="scrollNoBar" class="hyphenate">
+                <ul id="gamechatul"></ul>
+            </div>
+
+            <form id="formGame" action="">
+                <input id="inputGame" autocomplete="off" autofocus placeholder=""/><button>Send</button>
+            </form>
+        </div>
+
+        <div class="itemmain">
+            
+            
+            <div id="curwodel">
+                Current word should be displayed
+            </div>
+
+            <div id="diword">
+                It should display them words
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+
+
+    <div id="fieldScreen">
+
+        <div id="chatfield" class="scrollNoBar">
+            <ul id="messages"></ul>
+        </div>
+
+        <form id="form" action="">
+        <input id="input" autocomplete="off" autofocus/><button>Send</button>
+        </form>
+
+        <form id="roominform" action="">
+        <input id="roomin" autocomplete="off" /><button>Join</button>
+        </form>
+
+        <textarea id='textarea' placeholder="ʅTEXTAREAʅTEXTAREA" class="noscrollbar">&equiv;Te&times;tar&euml;&aacute;</textarea>
+        
+        <div id='divc' onclick='divchange(+1)' class="disable-select">
+            <h2>
+                <br>
+            </h2>
+            <p>Click me?</p>
+        </div>
+
+        <ol id='online_users'></ol>
+    </div>
+
+
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+
+        var socket = io()
+
+        var form = document.getElementById('form')
+        var input = document.getElementById('input')
+        var area = document.getElementById('textarea')
+        var roominform = document.getElementById('roominform')
+        var roomin = document.getElementById('roomin')
+        var divc = document.getElementById('divc')
+        const authScreen = document.getElementById('authScreen');
+        const fieldScreen = document.getElementById('fieldScreen');
+        const initialScreen = document.getElementById('initialScreen');
+        const symsScreen = document.getElementById('symsScreen');
+        const fieldBtn = document.getElementById('fieldButton')
+        const inputJoin = document.getElementById('inputJoin')
+        const newRoomBtn = document.getElementById('newRoomButton')
+        const diword = document.getElementById('diword')
+        const gamechatul = document.getElementById('gamechatul')
+        const inputGame = document.getElementById('inputGame')
+        const curwodel = document.getElementById('curwodel')
+        const titleGame = document.getElementById('titleGame')
+        const roomsOl = document.getElementById('rooms')
+        const gamechat = document.getElementById('gamechat')
+        const chatfield = document.getElementById('chatfield')
+        const inputAuth = document.getElementById('inputAuth')
+        
+
+        fieldBtn.addEventListener('click', goField);
+        newRoomBtn.addEventListener('click', newSyms)
+
+        var curewd = ''
+        var curoom = ''
+        var isrevealed = false
+        var usernameclient = ''
+        var clientmsges = []
+
+        var sfx = {
+            'hurt' : new Audio('server-assets/audio/hurt.mp3'),
+            'boom' : new Audio('server-assets/audio/boom.mp3'),
+            'bruh' : new Audio('server-assets/audio/bruh2.mp3'),
+            'hallway' : new Audio('server-assets/audio/fnaf-hallway-tocut.mp3'),
+            'frt-reverb' : new Audio('server-assets/audio/frt-reverb.mp3'),
+            'frt-jc' : new Audio('server-assets/audio/frt-juice.mp3'),
+            'hehehaha' : new Audio('server-assets/audio/hehehaha.mp3'),
+            'meep-merp' : new Audio('server-assets/audio/meep-merp.mp3'),
+            'techies' : new Audio('server-assets/audio/techies.mp3'),
+            'woo' : new Audio('server-assets/audio/woo.mp3'),
+            'ymte' : new Audio('server-assets/audio/ymte.mp3'),
+            'cave' : new Audio('server-assets/audio/cave.mp3'),
+            'hitmarker' : new Audio('server-assets/audio/hitmarker.mp3'),
+            'hits' : [
+                new Audio('server-assets/audio/hit1.wav'),
+                new Audio('server-assets/audio/hit2.wav'),
+                new Audio('server-assets/audio/hit3.wav'),
+                //new Audio('server-assets/audio/coin1.wav'),
+
+                // new Audio('server-assets/audio/frt-reverb.mp3'),
+
+                // idk doesn't work sfx['woo'],
+            ],
+            'meows' : [
+                new Audio('server-assets/audio/meow1.mp3'),
+                new Audio('server-assets/audio/meow2.mp3'),
+                new Audio('server-assets/audio/meow3.mp3'),
+                new Audio('server-assets/audio/meow4.mp3'),
+            ],
+
+
+        }
+        
+        console.log(sfx)
+        console.log(sfx['hits'])
+
+        socket.on('rooms', (rooms) => {
+            console.log("SOCKET.ON ROOMS " + rooms)
+            for (x in rooms) {
+                console.log(x)
+            }
+            console.log(rooms.length)
+            for (let i = 0; i < rooms.length; i++) {
+                console.log(rooms[i])
+            }
+            displayRooms(rooms)
+        })
+
+        function goField() {
+            initialScreen.style.display = "none";
+            fieldScreen.style.display = "block";
+        }
+
+        function newSyms() {
+            socket.emit('new-game');
+            initSyms();
+        } 
+
+        function joinSyms() {
+            const code = inputJoin.value;
+            //socket.emit('join-game', code);
+            initSyms();
+        }
+
+        function initSyms() {
+            initialScreen.style.display = "none"
+            symsScreen.style.display = "block"
+        }
+        
+        // callback to get divcount ?
+        divc_client = 0
+
+        var commands = ['s', 'e', 'yamete']
+
+        formGame.addEventListener('submit', e => {
+            e.preventDefault()
+            inp = inputGame.value
+            if (!inp) { return }
+            
+            if (commands.indexOf(inp) < 0) {
+                displayMessageGame(inp, usernameclient)
+                slay(sfx['hitmarker'])
+            }
+
+            if (inp == 's') {
+                if (isrevealed) {
+                    slay(sfx['meep-merp'])
+                }
+                else {
+                    slay(sfx['hurt'])
+                }
+            }
+            else if (inp == 'e') {
+                slay(sfx['boom'])
+            }
+            else if (inp == 'yamete') {
+                console.log('ymte')
+            }
+
+
+            socket.emit('game-chat-msg', inp, curoom)
+            inputGame.value = ''
+            gamechat.scrollTo({
+                top: gamechat.scrollHeight,
+                //behavior: 'smooth',
+            })
+            //gamechat.style.color = 'magenta'
+        })
+
+        formJoin.addEventListener('submit', function(e) {
+            e.preventDefault()
+            initSyms()
+            curoom = inputJoin.value
+            titleGame.innerHTML = `<h1>- ${curoom} -</h1>`
+            // might need new arguments
+            socket.emit('join-game', inputJoin.value, w => {
+                //return
+                // displayMessage(message)
+                displayDescs(w)
+            })
+        })
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault()
+            if (input.value) {
+                // var item = document.createElement('li')
+                // item.textContent = input.value
+                // messages.appendChild(item)
+                
+                displayMessage(input.value)
+                
+
+                socket.emit('chat message', input.value, roomin.value)
+                input.value = ''
+
+                // chatfield.scrollTo(0, chatfield.scrollHeight)
+            }
+        })
+
+        formAuth.addEventListener('submit', e => {
+            e.preventDefault()
+
+            inp = inputAuth.value
+            usernameclient
+            socket.emit('auth', inp, usernamecb => {
+                usernameclient = usernamecb
+            })
+
+            authScreen.style.display = "none";
+            initialScreen.style.display = "block";
+
+            inputAuth.value = ''
+        })
+
+        roominform.addEventListener('submit', e => {
+            e.preventDefault()
+            socket.emit('join-room', roomin.value, message => {
+                displayMessage(message)
+            }) 
+        })
+
+        area.addEventListener('keyup', function(e) {
+            socket.emit('area-value', area.value)
+
+            divchange(+1)
+        })
+
+        //area.addEventListener('wheel', divchange(+1));
+
+
+
+
+
+        // area.addEventListener('wheel', (e) => {
+        //         e.preventDefault()
+        //         //divc.innerHTML = `<h2>${divc_client - 1}</h2>`
+        //         //socket.emit('divc-change', -1)
+        //         divchange(-1)
+            
+        // })
+
+
+
+
+
+        function rint(min = 0, max) {
+            return min + Math.floor(Math.random() * (max + 1 - min));
+        }
+
+        /*
+        var sfx_hits = [
+            new Audio('media/hit1.wav'),
+            new Audio('media/hit2.wav'),
+            new Audio('media/hit3.wav'),
+        ]
+        */
+        
+        function slay(audio) {
+            audio.pause()
+            audio.currentTime = 0
+            audio.play()
+        }
+
+        // dirname = ''
+
+        // <div onlick='divchange()'> or divc.addEventListener ?
+        function divchange(dif = 1) {
+            // may use to make latency visually lower
+            //divc.innerHTML = ''
+            
+            /*
+            socket.emit('get dir')
+            
+            var sound1 = new Audio(dirname + '/hit1.wav')
+            sound1.play()
+            */           
+
+            /*
+            var buz = new Audio('media/BUBZ.mp3')
+            buz.play()
+            slay(sound1)
+            slay(buz)
+            slay(sfx_hits[rint(sfx_hits.length - 1)])
+            */
+
+            rin = rint(0, sfx['hits'].length-1)
+            //slay(sfx['hits'][rin])
+            let sound = sfx['hits'][rin] 
+            sound.currentTime = 0
+            sound.play()
+
+
+
+
+
+            
+            divc.innerHTML = `<h2>${divc_client + dif}</h2>`
+            socket.emit('divc-change', dif)
+                
+        }
+
+        function displayMessage(msg) {
+
+            var item = document.createElement('li')
+
+            if (msg.includes('://')) {
+                var linq = document.createElement('a')
+                linq.textContent = msg
+                linq.href = msg
+                linq.target = "_blank"
+                linq.rel = "noopener noreferrer"
+                item.appendChild(linq)
+            }
+            else {
+                item.textContent = msg
+            }
+
+            messages.appendChild(item)
+            //window.scrollTo(0, document.body.scrollHeight)
+            chatfield.scrollTo(0, chatfield.scrollHeight)
+            /*
+            window.scrollTo({
+                top: 0,
+                document.body.scrollHeight,
+                behavior: 'smooth'
+            })
+            */
+        }
+
+        function displayMessageGame(msg, sender = '') {
+            var item = document.createElement('li')
+            // needa make the sender bold
+            if (sender) { msg = `${sender}: ${msg}` }
+            item.textContent = msg
+            gamechatul.appendChild(item)
+            //window.scrollTo(0, document.body.scrollHeight)
+            gamechat.scrollTo({
+                top: gamechat.scrollHeight,
+            })
+        }
+
+        socket.on('chat message', function(msg) {
+            displayMessage(msg)
+        })
+
+        socket.on('game-chat-back', (msg, sender) => {
+            console.log('GOT THAT MESSG: ' + msg + ' from ' + sender)
+            displayMessageGame(msg, sender)
+        })
+
+        function displayUsers(users) {
+            var olist = document.getElementById('online_users')
+            olist.innerHTML = ''
+            for (let i = 0; i < users.length; i++) {
+                
+                var item = document.createElement('li')
+                item.onclick = () => {
+                    roomin.value = users[i]
+                }
+                if (users[i] == socket.id) {
+                    item.className = 'currentUser'
+                }
+                item.textContent = users[i]
+                online_users.appendChild(item)
+            }
+        }
+
+        function displayRooms(rooms) {
+            roomsOl.innerHTML = ''
+            for (let i = 0; i < rooms.length; i++)
+            {
+                console.log('FOR ROOM ' + i + ' - ' + rooms[i])
+                let item = document.createElement('li')
+                item.onclick = () => {
+                    initSyms()
+                    curoom = rooms[i]
+                    titleGame.innerHTML = `<h1>- ${curoom} -</h1>`
+                    socket.emit('join-game', curoom, (w, greetings, isrevd) => {
+                        //return
+                        // displayMessage(message)
+                        displayDescs(w)
+                        greetings.forEach(element => displayMessageGame(element))
+                        isrevealed = isrevd
+                    })
+                }
+                item.textContent = rooms[i]
+                roomsOl.appendChild(item)
+            }
+        }
+        
+        socket.on('user connected', function(usrs_onln) {
+            console.log('client user connected function')
+
+            // displayMessage(`User ${usrs_onln.slice(-1)} has connected`)
+
+            displayUsers(usrs_onln)
+        })
+
+        socket.on('user disconnected', function(usrs_onln, discuser) {
+            console.log('client user disconneced function')
+
+            // displayMessage(`User ${discuser} has disconnected`)
+            
+            displayUsers(usrs_onln)
+        })
+
+        socket.on('area-value-and-msges', function(area_value, msges) {
+            console.log('client area value receive')
+            var area = document.getElementById('textarea')
+            area.value = area_value
+            clientmsges = msges
+            clientmsges.forEach((m) => {
+                displayMessage(m)
+            })
+        })
+
+        socket.on('area-value', (area_value) => {
+            console.log('client area value receive')
+            var area = document.getElementById('textarea')
+            area.value = area_value
+        })
+
+        socket.on('divc-change', function(divcount) {
+            if (divcount != divc_client) {
+                divc.innerHTML = '<h2>' + divcount + '</h2>'
+            }
+            divc_client = divcount
+            slay('frt-reverb')
+        })
+
+        socket.on('get dir', function(dir) {
+            dirname = dir
+            console.log(dirname, dir)
+        })
+
+        socket.on('new-word', (w, room) => {
+            //console.log(diword.innerHTML)
+            //console.log(w)
+            //console.log(Object.keys(w))
+            curoom = room
+            titleGame.innerHTML = `<h1>- ${curoom} -</h1>`
+            displayDescs(w)
+            isrevealed = false
+        })
+
+        socket.on('game-chat-correct', (msg, guesser) => {
+            console.log('Game chat correct client mesg: ' + msg + guesser)
+            displayMessageGame(`${guesser} got it! The word was "${msg}".`)
+            displayMessageGame("Send \"e\" to proceed to the next word.")
+            curwodel.innerHTML = `<h2>${msg.split('').join(' ')}</h2>`
+            isrevealed = true
+        })
+
+        socket.on('reveal', nerw => {
+            //slay(sfx['hurt'])
+            let out = nerw.split('').join(' ')
+            curwodel.innerHTML = `<h2>${out}</h2>`
+        })
+
+        socket.on('audio', (audion, n = -1) => {
+            console.log("PLAYING AUDIO" + audion)
+            if (n > -1) {
+                slay(sfx[audion][n])
+            }
+            else {
+                slay(sfx[audion])
+            }
+        })
+
+        socket.on('fully-revealed', (innit) => {
+            isrevealed = innit
+        })
+
+        // implement later
+        function displaySyms(w) {
+
+            let out = ''
+            w[[Object.keys(w)[0]]]['synonyms'].forEach(function (item, index) {
+                out = out + item + ', '
+                //out = out + item + "<br>"
+                console.log(item)
+            })
+            hout = Object.keys(w)[0]
+            hout = hout.split('').join(' ')
+            console.log(w)
+            console.log("HOUT " + hout)
+            curewd = 'yheah ima do that later' 
+            curwodel.innerHTML = `<h2>${hout}</h2>`
+            diword.innerHTML = out
+        }
+
+        function displayDescs(w) {
+
+            let out = ''
+            w[[Object.keys(w)[0]]]['descs'].forEach(function (item, index) {
+                // out = out + item + ', '
+                out = out + "<li>" + item + "</li>"
+                console.log(item)
+            })
+            hout = Object.keys(w)[0]
+            hout = hout.split('').join(' ')
+            console.log(w)
+            console.log("HOUT " + hout)
+            curewd = 'yheah ima do that later' 
+            curwodel.innerHTML = `<h2>${hout}</h2>`
+            diword.innerHTML = out
+        }
+
+        /*
+        deson = document.getElementById('divson')
+        deson.innerHTML = "deson innerHTML test"
+        filePath = "words.json"
+        */
+
+
+
+    </script>
+  </body>
+</html>
